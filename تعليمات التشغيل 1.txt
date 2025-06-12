@@ -1,0 +1,304 @@
+Create new GitHub repository for your backend
+Upload these files to your repository:
+app.py
+requirements.txt
+vercel.json
+.gitignore
+
+Connect to Vercel:
+
+Go to Vercel Dashboard
+Import your GitHub repository
+Framework Preset: "Other"
+Deploy
+
+
+Add Environment Variables in Vercel Dashboard:
+bashSECRET_KEY=generate-a-random-32-character-string
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-gmail-app-password
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+MICROSOFT_CLIENT_ID=your-microsoft-client-id
+MICROSOFT_CLIENT_SECRET=your-microsoft-client-secret
+
+
+Step 2: Deploy Frontend to Vercel
+
+Update the frontend code:
+
+Replace https://your-api-domain.vercel.app/api with your actual backend URL
+Replace https://your-frontend-domain.vercel.app with your actual frontend URL
+
+
+Create HTML file and deploy to Vercel (or use the existing artifact)
+
+Step 3: Update OAuth Redirect URIs
+After deployment, update your OAuth settings:
+Google:
+
+Authorized redirect URIs: https://your-actual-backend-url.vercel.app/auth/google/callback
+
+Microsoft:
+
+Redirect URI: https://your-actual-backend-url.vercel.app/auth/microsoft/callback
+
+Step 4: Update CORS Settings
+In your backend code, update the CORS origins:
+pythonCORS(app, origins=['https://your-actual-frontend-url.vercel.app'])
+🔧 Local Development
+1. Clone and Setup
+bashgit clone your-repository
+cd your-project
+pip install -r requirements.txt
+2. Create .env file
+bashcp .env.example .env
+# Fill in your values
+3. Run locally
+bashpython app.py
+Server runs on http://localhost:5000
+📧 Email Templates
+The system sends beautiful Arabic emails for:
+
+✅ Account verification
+🔄 Password reset
+
+Both include branded styling matching your app design.
+🔒 Security Features
+
+✅ Password strength validation (8+ chars, uppercase, lowercase, number)
+✅ JWT tokens with 30-day expiration
+✅ Email verification required
+✅ Secure password hashing (Werkzeug)
+✅ CORS protection
+✅ SQL injection protection (SQLAlchemy ORM)
+✅ Rate limiting ready (add if needed)
+
+📱 API Endpoints
+Authentication
+
+POST /api/auth/register - Register new user
+POST /api/auth/login - Login user
+POST /api/auth/verify - Verify email
+POST /api/auth/forgot-password - Request password reset
+POST /api/auth/reset-password - Reset password
+
+OAuth
+
+GET /auth/google - Google OAuth login
+GET /auth/microsoft - Microsoft OAuth login
+
+User Management
+
+GET /api/user/profile - Get user profile (protected)
+PUT /api/user/profile - Update profile (protected)
+POST /api/auth/change-password - Change password (protected)
+
+Health
+
+GET /api/health - Health check
+
+🧪 Testing the System
+1. Test Email Registration
+bashcurl -X POST https://your-backend-url.vercel.app/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "أحمد محمد",
+    "email": "test@example.com",
+    "password": "Test123456"
+  }'
+2. Test Login
+bashcurl -X POST https://your-backend-url.vercel.app/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "test@example.com",
+    "password": "Test123456"
+  }'
+3. Test Protected Route
+bashcurl -X GET https://your-backend-url.vercel.app/api/user/profile \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+🎨 Frontend Customization
+Update Branding
+
+Colors: Change gradient colors in CSS
+Logo: Replace 💙 with your logo
+App Name: Change "شعور" to your app name
+Subtitle: Update the description
+
+Add Features
+
+Remember me checkbox
+Social media icons
+Terms & conditions
+Privacy policy links
+
+🔧 Advanced Configuration
+Database Migration (if needed)
+python# Add to app.py for migrations
+from flask_migrate import Migrate
+
+migrate = Migrate(app, db)
+Add Rate Limiting
+python# Add to requirements.txt
+Flask-Limiter==3.5.0
+
+# Add to app.py
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
+limiter = Limiter(
+    app,
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"]
+)
+
+# Apply to routes
+@app.route('/api/auth/login', methods=['POST'])
+@limiter.limit("5 per minute")
+def login():
+    # ... existing code
+Add Logging
+pythonimport logging
+from logging.handlers import RotatingFileHandler
+
+# Add to app.py
+if not app.debug:
+    file_handler = RotatingFileHandler('logs/sh3oor.log', maxBytes=10240, backupCount=10)
+    file_handler.setFormatter(logging.Formatter(
+        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+    ))
+    file_handler.setLevel(logging.INFO)
+    app.logger.addHandler(file_handler)
+    app.logger.setLevel(logging.INFO)
+    app.logger.info('Sh3oor startup')
+📊 Monitoring & Analytics
+Basic Metrics to Track
+
+User registrations per day
+Login success/failure rates
+Email verification rates
+OAuth vs email registration ratio
+Password reset requests
+
+Add User Analytics
+python# Add to User model
+class UserAnalytics(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    action = db.Column(db.String(50), nullable=False)  # login, logout, etc.
+    timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    ip_address = db.Column(db.String(45), nullable=True)
+    user_agent = db.Column(db.String(200), nullable=True)
+🚨 Troubleshooting
+Common Issues
+1. Email not sending
+
+Check Gmail app password
+Verify MAIL_USERNAME and MAIL_PASSWORD
+Enable 2-factor authentication on Gmail
+
+2. OAuth not working
+
+Verify redirect URIs match exactly
+Check client IDs and secrets
+Ensure OAuth APIs are enabled
+
+3. Database errors
+
+Check if database file exists
+Verify SQLAlchemy connection string
+Run db.create_all() if tables missing
+
+4. CORS errors
+
+Update CORS origins with correct frontend URL
+Check if frontend and backend URLs match
+
+5. JWT token issues
+
+Verify SECRET_KEY is set
+Check token expiration
+Ensure Authorization header format: Bearer <token>
+
+🔄 Deployment Updates
+Update Backend
+
+Push changes to GitHub
+Vercel auto-deploys
+Check logs in Vercel dashboard
+
+Update Frontend
+
+Update HTML file
+Replace in frontend deployment
+Clear browser cache
+
+📱 Mobile App Integration
+Flutter/React Native
+dart// Example API call
+final response = await http.post(
+  Uri.parse('https://your-backend-url.vercel.app/api/auth/login'),
+  headers: {'Content-Type': 'application/json'},
+  body: jsonEncode({
+    'email': email,
+    'password': password,
+  }),
+);
+iOS/Android WebView
+
+Use the same HTML login page
+Handle deep links for OAuth redirects
+Store JWT tokens securely
+
+🎯 Next Steps
+Phase 1: Basic Features ✅
+
+User registration & login
+Email verification
+Password reset
+OAuth integration
+
+Phase 2: Enhanced Features
+
+ Profile picture upload
+ Two-factor authentication
+ Social features (friends, posts)
+ Push notifications
+ Dark mode
+
+Phase 3: Advanced Features
+
+ Analytics dashboard
+ Admin panel
+ Content moderation
+ Multi-language support
+ API rate limiting
+
+📞 Support
+Getting Help
+
+Check error logs in Vercel dashboard
+Test API endpoints with Postman
+Verify environment variables
+Check OAuth provider configurations
+
+Resources
+
+Flask Documentation
+Vercel Documentation
+Google OAuth Guide
+Microsoft OAuth Guide
+
+
+🎉 Congratulations!
+You now have a complete, production-ready authentication system with:
+
+Beautiful Arabic UI
+Multiple login options
+Secure email verification
+Professional email templates
+OAuth integration
+JWT-based sessions
+Scalable architecture
+
+Your users can now safely register, login, and manage their accounts in شعور! 💙
