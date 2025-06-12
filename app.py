@@ -608,10 +608,7 @@ def not_found(e):
 def internal_error(e):
     return jsonify({'message': 'حدث خطأ في الخادم'}), 500
 
-# Initialize database
-@app.before_first_request
-def create_tables():
-    db.create_all()
+
 
 if __name__ == '__main__':
     with app.app_context():
